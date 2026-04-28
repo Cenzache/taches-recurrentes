@@ -2,18 +2,23 @@ import { Redis } from '@upstash/redis';
 
 const redis = Redis.fromEnv();
 
-function isDue(task) {
-  if (task.frequencyDays === 0) return !task.lastDoneDate;
-  if (!task.lastDoneDate) return true;
-  const elapsed = (Date.now() - task.lastDoneDate) / 86400000;
-  return elapsed >= task.frequencyDays;
-}
-
 function nextSaturday() {
   const d = new Date();
   const diff = (6 - d.getDay() + 7) % 7 || 7;
   d.setDate(d.getDate() + diff);
   return d;
+}
+
+function isDueForSaturday(task, saturday) {
+  if (task.frequencyDays === 0) {
+    if (task.lastDoneDate) return false;
+    // Ponctuelle : apparaît uniquement si la date prévue est <= samedi prochain
+    const taskDate = new Date(task.startDate + 'T00:00:00');
+    return taskDate <= saturday;
+  }
+  if (!task.lastDoneDate) return true;
+  const elapsed = (saturday - task.lastDoneDate) / 86400000;
+  return elapsed >= task.frequencyDays;
 }
 
 function toIcalDate(d) {
@@ -26,9 +31,9 @@ function escapeIcal(str) {
 
 export default async function handler(req, res) {
   const tasks = await redis.get('tasks') || [];
-  const dueTasks = tasks.filter(isDue);
-
   const sat = nextSaturday();
+  const dueTasks = tasks.filter(t => isDueForSaturday(t, sat));
+
   const start = new Date(sat); start.setHours(9, 0, 0, 0);
   const end   = new Date(sat); end.setHours(9, 30, 0, 0);
 

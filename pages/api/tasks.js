@@ -25,9 +25,18 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'PATCH') {
-    const { id, lastDoneDate } = req.body;
+    const { id, lastDoneDate, name, category, frequencyDays, startDate } = req.body;
     const tasks = await redis.get('tasks') || [];
-    const updated = tasks.map(t => t.id === id ? { ...t, lastDoneDate } : t);
+    const updated = tasks.map(t => {
+      if (t.id !== id) return t;
+      const patch = {};
+      if (lastDoneDate !== undefined) patch.lastDoneDate = lastDoneDate;
+      if (name !== undefined)         patch.name = name;
+      if (category !== undefined)     patch.category = category;
+      if (frequencyDays !== undefined) patch.frequencyDays = Number(frequencyDays);
+      if (startDate !== undefined)    patch.startDate = startDate;
+      return { ...t, ...patch };
+    });
     await redis.set('tasks', updated);
     return res.status(200).json({ ok: true });
   }
