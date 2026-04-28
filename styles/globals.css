@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; }
+
+body {
+  font-family: 'IBM Plex Mono', monospace;
+  background: #f8f8f6;
+  color: #111;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+input, select, button {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+}
+
+input[type="text"],
+input[type="date"],
+select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 0.5px solid #ccc;
+  background: #fff;
+  color: #111;
+  outline: none;
+  border-radius: 0;
+  appearance: none;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+select:focus {
+  border-color: #111;
+}
+
+button { cursor: pointer; border-radius: 0; }
