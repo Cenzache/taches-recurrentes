@@ -18,7 +18,7 @@ function isDueForSaturday(task, saturday) {
   }
   if (!task.lastDoneDate) return true;
   const elapsed = (saturday - task.lastDoneDate) / 86400000;
-  return elapsed >= task.frequencyDays;
+  return elapsed >= task.frequencyDays - 7;
 }
 
 function toIcalDate(d) {

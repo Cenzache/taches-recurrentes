@@ -24,7 +24,9 @@ function getStatus(task) {
   if (task.frequencyDays !== 0) {
     if (!task.lastDoneDate) return 'due';
     const elapsed = (Date.now() - task.lastDoneDate) / 86400000;
-    return elapsed >= task.frequencyDays ? 'due' : 'ok';
+    if (elapsed < 2) return 'done';
+    if (elapsed >= task.frequencyDays - 7) return 'due';
+    return 'standby';
   }
   // Ponctuelle
   if (task.lastDoneDate) return 'done';
