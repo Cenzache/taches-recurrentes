@@ -1,15 +1,17 @@
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
+
+const redis = Redis.fromEnv();
 
 export default async function handler(req, res) {
 
   if (req.method === 'GET') {
-    const tasks = await kv.get('tasks') || [];
+    const tasks = await redis.get('tasks') || [];
     return res.status(200).json(tasks);
   }
 
   if (req.method === 'POST') {
     const { name, startDate, frequencyDays } = req.body;
-    const tasks = await kv.get('tasks') || [];
+    const tasks = await redis.get('tasks') || [];
     const newTask = {
       id: Date.now().toString(),
       name,
@@ -17,22 +19,22 @@ export default async function handler(req, res) {
       frequencyDays: Number(frequencyDays),
       lastDoneDate: null,
     };
-    await kv.set('tasks', [...tasks, newTask]);
+    await redis.set('tasks', [...tasks, newTask]);
     return res.status(201).json(newTask);
   }
 
   if (req.method === 'PATCH') {
     const { id, lastDoneDate } = req.body;
-    const tasks = await kv.get('tasks') || [];
+    const tasks = await redis.get('tasks') || [];
     const updated = tasks.map(t => t.id === id ? { ...t, lastDoneDate } : t);
-    await kv.set('tasks', updated);
+    await redis.set('tasks', updated);
     return res.status(200).json({ ok: true });
   }
 
   if (req.method === 'DELETE') {
     const { id } = req.body;
-    const tasks = await kv.get('tasks') || [];
-    await kv.set('tasks', tasks.filter(t => t.id !== id));
+    const tasks = await redis.get('tasks') || [];
+    await redis.set('tasks', tasks.filter(t => t.id !== id));
     return res.status(200).json({ ok: true });
   }
 

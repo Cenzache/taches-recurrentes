@@ -1,4 +1,6 @@
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
+
+const redis = Redis.fromEnv();
 
 function isDue(task) {
   if (!task.lastDoneDate) return true;
@@ -22,7 +24,7 @@ function escapeIcal(str) {
 }
 
 export default async function handler(req, res) {
-  const tasks = await kv.get('tasks') || [];
+  const tasks = await redis.get('tasks') || [];
   const dueTasks = tasks.filter(isDue);
 
   const sat = nextSaturday();
