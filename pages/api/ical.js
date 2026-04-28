@@ -3,6 +3,7 @@ import { Redis } from '@upstash/redis';
 const redis = Redis.fromEnv();
 
 function isDue(task) {
+  if (task.frequencyDays === 0) return !task.lastDoneDate;
   if (!task.lastDoneDate) return true;
   const elapsed = (Date.now() - task.lastDoneDate) / 86400000;
   return elapsed >= task.frequencyDays;
@@ -36,7 +37,7 @@ export default async function handler(req, res) {
     : 'Taches du samedi — rien a faire';
 
   const description = dueTasks.length > 0
-    ? dueTasks.map(t => `• ${t.name}`).join('\n')
+    ? dueTasks.map(t => `• ${t.name}${t.category ? ' [' + t.category + ']' : ''}`).join('\n')
     : 'Toutes les taches sont a jour.';
 
   const ical = [

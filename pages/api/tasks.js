@@ -10,13 +10,14 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { name, startDate, frequencyDays } = req.body;
+    const { name, startDate, frequencyDays, category } = req.body;
     const tasks = await redis.get('tasks') || [];
     const newTask = {
       id: Date.now().toString(),
       name,
       startDate,
       frequencyDays: Number(frequencyDays),
+      category: category || '',
       lastDoneDate: null,
     };
     await redis.set('tasks', [...tasks, newTask]);
