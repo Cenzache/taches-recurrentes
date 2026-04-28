@@ -12,9 +12,9 @@ function nextSaturday() {
 function isDueForSaturday(task, saturday) {
   if (task.frequencyDays === 0) {
     if (task.lastDoneDate) return false;
-    // Ponctuelle : apparaît uniquement si la date prévue est <= samedi prochain
     const taskDate = new Date(task.startDate + 'T00:00:00');
-    return taskDate <= saturday;
+    const alertDate = new Date(taskDate.getTime() - (task.alertDays || 21) * 86400000);
+    return saturday >= alertDate;
   }
   if (!task.lastDoneDate) return true;
   const elapsed = (saturday - task.lastDoneDate) / 86400000;
@@ -52,7 +52,6 @@ export default async function handler(req, res) {
     'CALSCALE:GREGORIAN',
     'REFRESH-INTERVAL;VALUE=DURATION:P1D',
     'X-WR-CALNAME:Taches recurrentes',
-    'X-WR-CALDESC:Recapitulatif hebdomadaire des taches a faire',
     'BEGIN:VEVENT',
     `UID:taches-samedi-${sat.toISOString().split('T')[0]}@recurrentes`,
     `DTSTART:${toIcalDate(start)}`,

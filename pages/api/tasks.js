@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { name, startDate, frequencyDays, category } = req.body;
+    const { name, startDate, frequencyDays, category, alertDays } = req.body;
     const tasks = await redis.get('tasks') || [];
     const newTask = {
       id: Date.now().toString(),
@@ -18,6 +18,7 @@ export default async function handler(req, res) {
       startDate,
       frequencyDays: Number(frequencyDays),
       category: category || '',
+      alertDays: Number(alertDays) || 21,
       lastDoneDate: null,
     };
     await redis.set('tasks', [...tasks, newTask]);
@@ -25,16 +26,17 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'PATCH') {
-    const { id, lastDoneDate, name, category, frequencyDays, startDate } = req.body;
+    const { id, lastDoneDate, name, category, frequencyDays, startDate, alertDays } = req.body;
     const tasks = await redis.get('tasks') || [];
     const updated = tasks.map(t => {
       if (t.id !== id) return t;
       const patch = {};
       if (lastDoneDate !== undefined) patch.lastDoneDate = lastDoneDate;
-      if (name !== undefined)         patch.name = name;
-      if (category !== undefined)     patch.category = category;
+      if (name !== undefined)          patch.name = name;
+      if (category !== undefined)      patch.category = category;
       if (frequencyDays !== undefined) patch.frequencyDays = Number(frequencyDays);
-      if (startDate !== undefined)    patch.startDate = startDate;
+      if (startDate !== undefined)     patch.startDate = startDate;
+      if (alertDays !== undefined)     patch.alertDays = Number(alertDays);
       return { ...t, ...patch };
     });
     await redis.set('tasks', updated);
