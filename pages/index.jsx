@@ -341,7 +341,7 @@ export default function Home() {
 
                 {/* Edit */}
                 <button onClick={() => startEdit(task)}
-                  style={{ fontSize: 11, background: 'none', border: 'none', color: '#ccc', padding: '0 2px', cursor: 'pointer' }}
+                  style={{ fontSize: 25, background: 'none', border: 'none', color: '#ccc', padding: '0 2px', cursor: 'pointer' }}
                   onMouseEnter={e => e.target.style.color = '#111'}
                   onMouseLeave={e => e.target.style.color = '#ccc'}>✎</button>
 
